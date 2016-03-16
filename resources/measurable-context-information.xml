@@ -60,8 +60,8 @@
 			<parameter id="CP_ACTION_END_TIMESTAMP">
 				<parameterValue type="INTEGER" />
 			</parameter>
-			<parameter id="CP_ACTION_REFERENCED_LEARNING_NUGGET">
-				<parameterValue type="INTEGER" />
+			<parameter id="CP_ACTION_REFERNCED_LEARNING_NUGGET">
+				<parameterValue type="STRING" />
 			</parameter>
 		</parameters>
 	</information>
@@ -551,6 +551,17 @@
 				<parameterValue type="FLOAT" min="-180" max="180" />
 			</parameter>
 		</parameters>
+		<validity>
+			<valuePreprocessing>
+				<valueMapping source='false' target='0.0' />
+				<valueMapping source='true' target='1.0' />
+			</valuePreprocessing>
+			<terms>
+				<term name="did_leave" definition="1"/>
+			</terms>
+			<dependencies></dependencies>
+			<rules></rules>
+		</validity>
 	</information>
 	<information id="CI_DID_LEAVE_LOCATION">
 		<contextClasses>
@@ -571,6 +582,17 @@
 				<parameterValue type="FLOAT" min="-180" max="180" />
 			</parameter>
 		</parameters>
+		<validity>
+			<valuePreprocessing>
+				<valueMapping source='false' target='0.0' />
+				<valueMapping source='true' target='1.0' />
+			</valuePreprocessing>
+			<terms>
+				<term name="did_leave" definition="1"/>
+			</terms>
+			<dependencies></dependencies>
+			<rules></rules>
+		</validity>
 	</information>
 	<information id="CI_IS_AT_LOCATION">
 		<contextClasses>
@@ -674,6 +696,50 @@
 				<operator id="NO_VALUE" />
 			</operators>
 		</contextValue>
+		<validity>
+			<terms></terms>
+			<dependencies>
+				<dependency informationID="CI_USER_MOVEMENT_SPEED" />
+				<dependency informationID="CI_USER_MEANS_OF_TRANSPORTATION" />
+			</dependencies>
+			<rules>
+				<rule name="fast_travel" validity="low" weight="0.7">
+					<logicalBlock operator="ATOMIC">
+						<ruleItem informationID="CI_USER_MOVEMENT_SPEED" termID="fast" />
+					</logicalBlock>
+				</rule>
+				<rule name="far_from_destination" validity="low" weight="1.0">
+					<logicalBlock operator="AND">
+						<logicalBlock operator="NOT">
+							<ruleItem informationID="CI_DID_LEAVE_LOCATION" termID="did_leave" />
+						</logicalBlock>
+						<logicalBlock operator="NOT">
+							<ruleItem informationID="CI_DID_ARRIVE_AT_LOCATION" termID="has_arrived" />
+						</logicalBlock>
+					</logicalBlock>
+				</rule>
+				<rule name="approaching" validity="average" weight="0.7">
+					<logicalBlock operator="AND">
+						<logicalBlock operator="ATOMIC">
+							<ruleItem informationID="CI_USER_LOCATION_DISTANCE" termID="close" />
+						</logicalBlock>
+						<logicalBlock operator="NOT">
+							<ruleItem informationID="CI_USER_MOVEMENT_SPEED" termID="stationary" />
+						</logicalBlock>
+					</logicalBlock>
+				</rule>
+				<rule name="stationary" validity="high" weight="0.7">
+					<logicalBlock operator="ATOMIC">
+						<ruleItem informationID="CI_USER_MOVEMENT_SPEED" termID="stationary" />
+					</logicalBlock>
+				</rule>
+				<rule name="has_arrived" validity="high" weight="1.0">
+					<logicalBlock operator="ATOMIC">
+						<ruleItem informationID="CI_DID_ARRIVE_AT_LOCATION" termID="has_arrived" />
+					</logicalBlock>
+				</rule>
+			</rules>
+		</validity>
 	</information>
 	<information id="CI_USER_LOCATION_LONGITUDE">
 		<contextClasses>
@@ -688,6 +754,50 @@
 				<operator id="NO_VALUE" />
 			</operators>
 		</contextValue>
+		<validity>
+			<terms></terms>
+			<dependencies>
+				<dependency informationID="CI_USER_MOVEMENT_SPEED" />
+				<dependency informationID="CI_USER_MEANS_OF_TRANSPORTATION" />
+			</dependencies>
+			<rules>
+				<rule name="fast_travel" validity="low" weight="0.7">
+					<logicalBlock operator="ATOMIC">
+						<ruleItem informationID="CI_USER_MOVEMENT_SPEED" termID="fast" />
+					</logicalBlock>
+				</rule>
+				<rule name="far_from_destination" validity="low" weight="1.0">
+					<logicalBlock operator="AND">
+						<logicalBlock operator="NOT">
+							<ruleItem informationID="CI_DID_LEAVE_LOCATION" termID="did_leave" />
+						</logicalBlock>
+						<logicalBlock operator="NOT">
+							<ruleItem informationID="CI_DID_ARRIVE_AT_LOCATION" termID="has_arrived" />
+						</logicalBlock>
+					</logicalBlock>
+				</rule>
+				<rule name="approaching" validity="average" weight="0.7">
+					<logicalBlock operator="AND">
+						<logicalBlock operator="ATOMIC">
+							<ruleItem informationID="CI_USER_LOCATION_DISTANCE" termID="close" />
+						</logicalBlock>
+						<logicalBlock operator="NOT">
+							<ruleItem informationID="CI_USER_MOVEMENT_SPEED" termID="stationary" />
+						</logicalBlock>
+					</logicalBlock>
+				</rule>
+				<rule name="stationary" validity="high" weight="0.7">
+					<logicalBlock operator="ATOMIC">
+						<ruleItem informationID="CI_USER_MOVEMENT_SPEED" termID="stationary" />
+					</logicalBlock>
+				</rule>
+				<rule name="has_arrived" validity="high" weight="1.0">
+					<logicalBlock operator="ATOMIC">
+						<ruleItem informationID="CI_DID_ARRIVE_AT_LOCATION" termID="has_arrived" />
+					</logicalBlock>
+				</rule>
+			</rules>
+		</validity>
 	</information>
 	<information id="CI_USER_LOCATION_REGION">
 		<contextClasses>
@@ -718,6 +828,20 @@
 				<value>TRANSPORTATION</value>
 			</possibleValues>
 		</contextValue>
+		<validity>
+			<valuePreprocessing>
+				<valueMapping source='AFOOT' target='0.0' />
+				<valueMapping source='BY_BIKE' target='1.0' />
+				<valueMapping source='TRANSPORTATION' target='2.0' />
+			</valuePreprocessing>
+			<terms>
+				<term name='afoot' definition='1' />
+				<term name='by_bike' definition='2' />
+				<term name='transportation' definition='3' />
+			</terms>
+			<dependencies></dependencies>
+			<rules></rules>
+		</validity>
 	</information>
 	<information id="CI_USER_MOVEMENT_SPEED">
 		<contextClasses>
@@ -742,6 +866,17 @@
 				</parameterValue>
 			</parameter>
 		</parameters>
+		<validity>
+			<terms>
+				<term name="stationary" definition="0" />
+				<term name="slow" definition="(0, 1) (7, 0)" />
+				<term name="fast" definition="TRAPE 5 7 11 15" />
+				<term name="very_fast" definition="(13, 0) (20, 1)" />
+			</terms>
+			<dependencies>
+			</dependencies>
+			<rules></rules>
+		</validity>
 	</information>
 	<information id="CI_USER_ROLE" multiplicity="MULTIPLE">
 		<contextClasses>
